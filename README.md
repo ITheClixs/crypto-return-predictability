@@ -1,6 +1,6 @@
-# Are Short-Horizon Cryptocurrency Returns Predictable Out of Sample?
+# Testing the Martingale Hypothesis in Cryptocurrency Returns
 
-**A purged walk-forward study with nested-model tests, transaction costs, and multiple-testing control**
+**Nested MSPE inference, purged walk-forward validation and multiple-testing control, with bootstrap bounds on net Sharpe ratios**
 
 [![ci](https://github.com/ITheClixs/crypto-return-predictability/actions/workflows/ci.yml/badge.svg)](https://github.com/ITheClixs/crypto-return-predictability/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.12%2B-blue)
