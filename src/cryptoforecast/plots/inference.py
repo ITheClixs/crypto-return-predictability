@@ -54,8 +54,8 @@ def plot_dm_versus_clark_west(table: pd.DataFrame, out_path: Path) -> None:
             zorder=3,
         )
 
-    # Label only the settings Clark-West rescues; the losing cluster is described
-    # in one annotation instead of six overlapping ones.
+    # Label only the settings Clark-West rescues; the cluster where DM favours the
+    # benchmark is described in one annotation instead of overlapping per-point labels.
     rescued = sub[sub["cw_stat"] > CRIT_ONE_SIDED].sort_values("cw_stat", ascending=False)
     for offset, (_, row) in enumerate(rescued.iterrows()):
         ax.annotate(
@@ -67,13 +67,20 @@ def plot_dm_versus_clark_west(table: pd.DataFrame, out_path: Path) -> None:
             color="#333333",
         )
 
-    losing = sub[(sub["dm_stat"] > CRIT_TWO_SIDED) & (sub["cw_stat"] < 0)]
-    if not losing.empty:
+    # Clark-West is one-sided: a negative statistic fails to reject the null, it is not
+    # evidence that the model is worse. Only DM says anything about this cluster, and
+    # under nesting DM is the test biased toward the benchmark.
+    dm_favours_benchmark = sub[(sub["dm_stat"] > CRIT_TWO_SIDED) & (sub["cw_stat"] < 0)]
+    if not dm_favours_benchmark.empty:
         ax.annotate(
-            f"{len(losing)} settings: both tests agree\nthe model is worse",
-            (float(losing["dm_stat"].mean()), float(losing["cw_stat"].mean())),
+            f"{len(dm_favours_benchmark)} settings:\nDM favours the benchmark;\n"
+            "CW does not reject the null",
+            (
+                float(dm_favours_benchmark["dm_stat"].mean()),
+                float(dm_favours_benchmark["cw_stat"].mean()),
+            ),
             textcoords="offset points",
-            xytext=(-104, -4),
+            xytext=(-68, 34),
             fontsize=7,
             color="#333333",
             ha="left",
@@ -83,7 +90,7 @@ def plot_dm_versus_clark_west(table: pd.DataFrame, out_path: Path) -> None:
     ax.set_xlim(sub["dm_stat"].min() - 1.4, sub["dm_stat"].max() + x_pad)
     ax.set_ylim(sub["cw_stat"].min() - y_pad, sub["cw_stat"].max() + y_pad)
     ax.set_xlabel("Diebold-Mariano statistic  (positive = model looks worse)")
-    ax.set_ylabel("Clark-West statistic  (positive = model predicts)")
+    ax.set_ylabel("Clark-West statistic  (positive favours the model)")
     ax.set_title("The nested-model correction moves the verdict")
     ax.legend(loc="upper right")
     finish(
