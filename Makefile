@@ -68,9 +68,11 @@ certificate:
 	$(PY) audit/scripts/gen_forecasts.py
 	$(PY) audit/scripts/certificate_study.py
 	$(PY) audit/scripts/certificate_study.py --payoff sign
+	$(PY) audit/scripts/certificate_study.py --payoff tanh
 	$(PY) audit/scripts/positive_control.py
 	$(PY) audit/scripts/power_head_to_head.py 400
 	$(PY) audit/scripts/certificate_calibration.py 400
+	$(PY) audit/scripts/certificate_calibration.py 400 0
 	$(PY) audit/scripts/garch_null.py 400
 	$(PY) audit/scripts/execution_contrast.py
 	$(PY) audit/scripts/bootstrap_stability.py

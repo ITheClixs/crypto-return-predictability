@@ -2,26 +2,31 @@
 
 Three experiments, all on data containing no conditional predictability whatsoever.
 
-**Drift sweep.** The "model" is the expanding-window mean -- an estimator with no features
-at all, so the correct answer is always "no incremental predictability". Clark-West against
-a zero forecast is run alongside Clark-West against that same recursive mean and alongside
-the certificate. The first rejects more and more often as the asset's drift grows, at a
-rate the closed form predicts; the second is roughly correct; the certificate is bounded by
-its nominal level uniformly in the drift.
+**Drift sweep.** The "model" is the expanding-window mean plus the out-of-sample noise of
+``N_FEATURES`` estimated coefficients that are truly zero, so the correct answer is always
+"no incremental predictability". Clark-West against a zero forecast is run alongside
+Clark-West against that same recursive mean and alongside the certificate. The first rejects
+more and more often as the asset's drift grows, at a rate the closed form predicts; the
+second is roughly correct; the certificate is bounded by its nominal level uniformly in the
+drift.
 
-**Closed form.** With per-period Sharpe ``S`` and estimation window ``k``, the expected
-zero-benchmark Clark-West statistic over ``n`` test points is
+**Closed form.** With per-period Sharpe ``S``, estimation window ``k`` and ``p`` estimated
+coefficients that are truly zero, the expected zero-benchmark Clark-West statistic over
+``n`` test points is
 
-    E[CW_0]  ~=  sqrt(n) S^2 / sqrt(S^2 + 1/k),
+    E[CW_0]  ~=  sqrt(n) S^2 / sqrt(S^2 + (1 + p)/k),
 
 which tends to ``sqrt(n) S`` once the window is long enough to pin the drift down --- that
 is, the statistic converges to the *t-statistic of the asset's mean return*. The script
-prints predicted against measured.
+prints predicted against measured, with ``p = N_FEATURES`` as in the simulated model.
 
 **Detection time.** Under a real signal of known information ratio, the median time to
 certify is compared with ``2[ln(1/alpha) + regret] / IR^2``.
 
-Usage: certificate_calibration.py [reps]
+Usage: certificate_calibration.py [reps] [n_features]
+
+With ``n_features`` other than the study's twelve, only the drift sweep runs, and it is written
+to ``audit/certificate_drift_sweep_p<n_features>.csv``.
 """
 
 from __future__ import annotations
@@ -53,8 +58,10 @@ def _clark_west(outcome: np.ndarray, model: np.ndarray, bench: np.ndarray) -> fl
     return float(adjusted.mean() / math.sqrt(lrv / adjusted.size)) if lrv > 0 else float("nan")
 
 
-#: Number of pure-noise features the larger model estimates. The study uses twelve.
-N_FEATURES = 12
+#: Number of pure-noise features the larger model estimates. The study uses twelve; a second
+#: argument overrides it, and ``0`` reproduces the featureless rows of the manuscript's table.
+STUDY_FEATURES = 12
+N_FEATURES = int(sys.argv[2]) if len(sys.argv) > 2 else STUDY_FEATURES
 
 
 def _expanding_mean(pre: np.ndarray, outcome: np.ndarray) -> np.ndarray:
@@ -95,7 +102,14 @@ def drift_sweep(reps: int) -> pd.DataFrame:
             zero_hits += statistics[rep] > CRITICAL
             mean_hits += _clark_west(outcome, model, benchmark) > CRITICAL
             cert_hits += certify(model - benchmark, outcome, drift_resolution=GRID).rejects(0.05)
-        predicted = math.sqrt(N_TEST) * per_period**2 / math.sqrt(per_period**2 + 1.0 / WINDOW)
+        # The closed form of Proposition 1 at the model's own p, not at p = 0: the
+        # simulated model estimates N_FEATURES coefficients, and dropping the (1 + p)
+        # term predicts the featureless model instead of the one being measured.
+        predicted = (
+            math.sqrt(N_TEST)
+            * per_period**2
+            / math.sqrt(per_period**2 + (1.0 + N_FEATURES) / WINDOW)
+        )
         rows.append(
             {
                 "annual_sharpe": annual_sharpe,
@@ -143,10 +157,18 @@ def detection_check(reps: int) -> pd.DataFrame:
 
 def main() -> None:
     sweep = drift_sweep(REPS)
-    sweep.to_csv("audit/certificate_drift_sweep.csv", index=False)
+    suffix = "" if N_FEATURES == STUDY_FEATURES else f"_p{N_FEATURES}"
+    sweep_path = f"audit/certificate_drift_sweep{suffix}.csv"
+    sweep.to_csv(sweep_path, index=False)
     print("Rejection rate on data with no predictability, as the asset's drift grows.")
-    print("The model has no features: it is the recursive mean. Nominal level 5%.\n")
+    print(
+        f"The model is the recursive mean plus {N_FEATURES} pure-noise coefficients. "
+        "Nominal level 5%.\n"
+    )
     print(sweep.to_string(index=False, float_format=lambda v: f"{v:9.3f}"))
+    if suffix:  # the detection check does not depend on the feature count
+        print(f"\nwrote {sweep_path}")
+        return
 
     detect = detection_check(REPS)
     detect.to_csv("audit/certificate_detection.csv", index=False)
