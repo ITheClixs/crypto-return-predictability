@@ -42,8 +42,10 @@ an instrument.
 
 - **The distortion has a closed form.** `certificate_calibration.py` validates
   `E[CW_0] ~= sqrt(n) S^2 / sqrt(S^2 + (1+p)/k)`: predicted 1.341 against measured 1.348 at an
-  annualised Sharpe of 0.8. A model with *no features at all* is declared significantly
-  predictive in 43% of samples at BTC's drift, 97.5% at a Sharpe of 1.6.
+  annualised Sharpe of 0.8 (`certificate_calibration.py 400 0`). A model with *no features at
+  all* is declared significantly predictive in 43% of samples at that drift Sharpe, 97.5% at
+  1.6. BTC's own log-return drift Sharpe is 0.60; on resampled BTC returns the featureless
+  model is rejected in 27–42% of samples.
 - **The benchmark problem is solved rather than reported.** `src/alphacert/` implements a
   drift-robust, anytime-valid certificate whose validity is a finite-sample theorem, so it
   needs no calibration at all. Measured rejection rate on data with no predictability:
@@ -74,7 +76,8 @@ its guarantee was proved rather than measured.
 this is Issue 9 in practice, and it was reproduced by accident while writing this README: the same
 script produced 2 186 forecasts per setting from the repo root and 2 198 from `audit/`.
 
-Requires the committed `data/cache/` (sample pinned at 2026-07-18) and `./venv`.
+Requires a populated `data/cache/` (`make data`; not committed; sample end pinned at
+2026-07-18 in the configuration) and `./venv`.
 
 ```bash
 PY=./venv/bin/python

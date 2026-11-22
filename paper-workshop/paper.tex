@@ -76,7 +76,7 @@ estimate's own error and still gives no guarantee at a data-dependent stopping t
 \begin{table}[h]
   \centering
   \caption{False rejections at nominal $5\%$ against a signal that is pure noise, as the
-  asset's drift grows. $400$ replications per row, $800$ daily observations. The certificate's
+  asset's drift grows. $400$ replications per row, $2{,}186$ daily test observations. The certificate's
   bound holds uniformly in the drift, which is the property being illustrated. Source:
   \texttt{certificate\_drift\_sweep.csv}.}
   \label{tab:drift}
@@ -85,12 +85,12 @@ estimate's own error and still gives no guarantee at a data-dependent stopping t
     \toprule
     Asset's annualised Sharpe & Clark--West vs.\ zero & Clark--West vs.\ mean & E-process \\
     \midrule
-    $0.0$ & $0.053$ & $0.058$ & $0.003$ \\
+    $0.0$ & $0.053$ & $0.058$ & $0.005$ \\
     $0.4$ & $0.090$ & $0.063$ & $0.003$ \\
-    $0.8$ & $0.118$ & $0.058$ & $0.003$ \\
-    $1.2$ & $0.330$ & $0.063$ & $0.003$ \\
-    $1.6$ & $0.560$ & $0.055$ & $0.010$ \\
-    $2.0$ & $\mathbf{0.810}$ & $0.040$ & $0.008$ \\
+    $0.8$ & $0.118$ & $0.058$ & $0.005$ \\
+    $1.2$ & $0.330$ & $0.063$ & $0.005$ \\
+    $1.6$ & $0.560$ & $0.055$ & $0.008$ \\
+    $2.0$ & $\mathbf{0.810}$ & $0.040$ & $0.010$ \\
     \bottomrule
   \end{tabular}
 \end{table}

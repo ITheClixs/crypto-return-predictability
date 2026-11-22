@@ -8,6 +8,88 @@ reproduce from `audit/scripts/`.
 
 ---
 
+## 2026-11-22 — An inferential overstatement, and certificate numbers that did not reproduce
+
+A consistency pass that re-ran every certificate script against the committed code. Clark–West,
+Diebold–Mariano, size, power, positive-control, bootstrap and cost numbers all reproduce exactly;
+the certificate's own numbers did not, and are replaced. No data, method or threshold changed.
+
+### R30 — A negative Clark–West statistic was read as evidence the model is worse
+
+**Was:** Figure "DM against CW" annotated five settings as "both tests agree the model is worse",
+selected by `dm_stat > 1.96 and cw_stat < 0`, and the y-axis read "positive = model predicts".
+
+**Why wrong:** Clark–West is one-sided. A negative statistic fails to reject; it is not evidence of
+inferiority, and the paper itself argues DM is biased toward the benchmark under nesting. Two of
+the five (SOL ridge and elastic net, h=7) reject *for* the model against the recursive mean
+(p = 0.022, 0.011).
+
+**Now:** "5 settings: DM favours the benchmark; CW does not reject the null"; the axis states the
+sign convention ("positive favours the model"); the caption says so; one sentence of prose ("ETH at
+h=7 moves further against the models") is restated as moving further from rejection. A unit test
+pins the annotation.
+
+### R31 — The published certificate table was the tanh payoff, labelled identity (CRITICAL)
+
+**Was:** Table "Clark–West against certificates" (identity payoff): largest e-value 3.05, grid
+1.43, designed 2.85, implied IR 0–0.69, directional 1.07; tanh variant 1.81 / 1.18.
+
+**Why wrong:** the committed `certificate_study_identity.csv` is byte-identical to the output of
+`certificate_study.py --payoff tanh`. When R26 made identity the default, the table kept the tanh
+numbers. The "1.81 / 1.18" tanh figures predate the 0.9/0.1 capital split of R28.
+
+**Now:** identity: largest 5.49 (BTC ridge h=1), grid 1.82, designed 6.17, implied IR 0.08–0.75,
+directional 1.13; tanh: 3.05 / 1.43 (now scripted in `make certificate`). Nothing is certified and
+e-BH selects nothing, as before; the ceilings are unchanged. The settings Clark–West likes most
+now also carry the largest implied ratios.
+
+### R32 — Calibration outputs predated the R28 certificate
+
+`certificate_drift_sweep.csv` and `certificate_detection.csv` were last generated before R28. Re-run:
+certificate size across the drift sweep 0.25–1.0% (cells moved by at most one rejection in 400), GARCH-null
+certificate size 1.00% (was 0.25%), and the simulated median detection time at IR = 2 with a
+pre-committed stake **2.56 years against 1.84 predicted** (was 1.93). The law's column of Table
+"years of daily data" is therefore optimistic for this implementation, and the manuscript now says
+so instead of "simulated times match".
+
+### R33 — The closed-form column of the drift sweep predicted the wrong model
+
+`certificate_calibration.py` computed `sqrt(n) S^2 / sqrt(S^2 + 1/k)`, the p = 0 form, while the
+simulated model estimates p = 12 coefficients. At the model's own p the prediction is 0.13, 0.49,
+1.07, 1.81, 2.67 against measured 0.17, 0.42, 1.07, 1.82, 2.60 (was 0.42, 1.34, 2.40, 3.46, 4.50).
+The featureless rows (1.34 / 1.35 / 43%, 3.46 / 3.70 / 97.5%) were not reproducible from any
+committed script; `certificate_calibration.py 400 0` now reproduces them exactly.
+
+### R34 — Smaller factual corrections
+
+- BTC's drift Sharpe is 0.60 on the log returns the study forecasts, not 0.84 (0.84 is buy-and-hold
+  on simple returns). The 43% is the Sharpe-0.8 grid point; on resampled BTC returns the
+  featureless model is rejected in 27–42% (Table "size", drift-only row). Abstract, introduction,
+  conclusion and README now say which is which.
+- Stale numbers left behind by earlier passes: introduction power 0.31 → 0.48 and grid e-value;
+  Figure 1 caption; conclusion; positive control (365/416/148 days, 4.2e9, 7.5e8, 1.3e-9);
+  deflated Sharpe maximum 0.715 (SOL elastic net h=7; 0.847 was the BTC benchmark); bootstrap
+  resamples 10,000 not 500; residual size 5.7–7.2% not 7–8%; execution-table means 0.40 / 0.09 /
+  0.17; cost break-even median 42 bp over all 18 (two settings exceed the 200 bp sweep); R² of the
+  two BTC h=1 survivors is −0.0079 and +0.0031, not both negative; sample is 2,755 bars to
+  2026-07-17.
+- The paper said the Yahoo cache was committed with SHA-256 digests. It is not (`data/cache/` is
+  gitignored). The text now says so.
+- `paper/tables/*.tex` had not been regenerated since 2026-08-03 and showed the infeasible
+  same-close backtest (two Sharpe intervals excluding zero) and the invalid phase-averaged PT.
+  Regenerated via `make paper`; the sign-timing column is now the rotation test the code already
+  computed, and its one marginal cell (ETH elastic net h=7, p = 0.050, anti-predictive) is stated.
+- `cryptoforecast report` globbed every PNG in `reports/figures/` and renumbered the report around
+  the certificate and equity figures; it now uses the declared figure list. The generated report
+  no longer repeats the "evidence of a weak signal" reading the paper retracts.
+
+**Open:** `audit/forecasts.csv` was generated before the end date was pinned and carries one more
+bar per series (2026-07-17 close) than the pinned study (n = 2186 vs 2185 at h = 1). The
+certificate numbers above are computed on it. Regenerating it with `gen_forecasts.py` would align
+the samples and move certificate numbers slightly.
+
+---
+
 ## 2026-08-06 — An error in our own corollary, and the price of the guarantee
 
 An adversarial re-read of the manuscript, in the voice of a referee who would run the

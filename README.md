@@ -23,10 +23,11 @@ drift* **and** *no conditional predictability* jointly. In closed form (Proposit
 $$\mathbb{E}[\mathrm{CW}_0] \approx \frac{\sqrt{n} S^2}{\sqrt{S^2 + (1+p)/k}} \longrightarrow \sqrt{n} S \quad \text{when } k S^2 \gg 1+p,$$
 
 for per-period Sharpe ratio $S$, estimation window $k$ and $p$ estimated coefficients — the
-statistic **converges to the $t$-statistic of the asset's mean return**. Measured: at
-Bitcoin's realised drift a model with *no features at all* is declared significantly
-predictive in **43%** of samples at a nominal 5%, and **81%** at an annualised Sharpe ratio
-of 2.0. Swapping in the recursive mean removes the leading term and leaves the benchmark's
+statistic **converges to the $t$-statistic of the asset's mean return**. Measured: at an
+annualised drift Sharpe ratio of 0.8 a model with *no features at all* is declared
+significantly predictive in **43%** of samples at a nominal 5% (on resampled Bitcoin returns,
+whose log-return drift Sharpe is 0.60, in 27–42%); with twelve estimated coefficients it is
+12%, rising to **81%** at a Sharpe ratio of 2.0. Swapping in the recursive mean removes the leading term and leaves the benchmark's
 own estimation error behind.
 
 ### The instrument
@@ -46,7 +47,7 @@ theorem that covers OLS.
 
 | | Clark–West | Certificate |
 |---|---|---|
-| Rejection rate at Sharpe 0.0 / 2.0, no predictability | 5.2% / **81%** (vs zero) | 0.3% / 0.8% |
+| Rejection rate at Sharpe 0.0 / 2.0, no predictability | 5.2% / **81%** (vs zero) | 0.5% / 1.0% |
 | Power at IR = 2, size-matched | 0.85 | 0.76 |
 | Calibration needed | 2,000 pipeline refits, hours | none — validity is a theorem |
 | Valid if you look every day | no | yes, at every stopping time |
@@ -130,10 +131,10 @@ Three assets, two horizons, three estimators, purged and embargoed walk-forward 
 over 2020–2026, programmatic leakage tests, transaction costs, feasible one-bar entry delay,
 staggered portfolios, exposure regressions.
 
-- **Nothing is certified.** Largest e-value 3.05 against the 20 required; grid-level e-value
-  **1.43**; e-BH selects nothing; the directional variant (which replaces an invalid
-  Pesaran–Timmermann average) gives 1.07.
-- **Implied information ratios run 0.00 to 0.69**, against a certifiable floor of 1.59.
+- **Nothing is certified.** Largest e-value 5.49 against the 20 required; grid-level e-value
+  **1.82**; e-BH selects nothing; the directional variant (which replaces an invalid
+  Pesaran–Timmermann average) gives 1.13.
+- **Implied information ratios run 0.08 to 0.75**, against a certifiable floor of 1.59.
 - **Ceiling:** after six years, the incremental annualised information ratio of twelve
   standard technical features on these three assets is **between 0.63 and 2.55, every
   interval containing zero.**
@@ -283,9 +284,9 @@ Daily OHLCV bars from Yahoo Finance, adjusted, for the USD pairs of three assets
 
 | Asset | Bars | First | Last | Labeled rows ($h{=}1$) | Folds |
 | --- | ---: | --- | --- | ---: | ---: |
-| BTC | 2,756 | 2019-01-01 | 2026-07-18 | 2,696 | 35 |
-| ETH | 2,756 | 2019-01-01 | 2026-07-18 | 2,696 | 35 |
-| SOL | 2,291 | 2020-04-10 | 2026-07-18 | 2,231 | 28 |
+| BTC | 2,755 | 2019-01-01 | 2026-07-17 | 2,695 | 35 |
+| ETH | 2,755 | 2019-01-01 | 2026-07-17 | 2,695 | 35 |
+| SOL | 2,290 | 2020-04-10 | 2026-07-17 | 2,230 | 28 |
 
 Cryptocurrency markets trade every calendar day, so the bar index is contiguous with no
 weekend or holiday gaps; this was verified rather than assumed, and the split logic in
@@ -721,8 +722,10 @@ positive favours the model.*
 That ridge posts $\mathrm{CW} = +2.62$, $p = 0.004$ while its $R^2_{OS}$ is $-0.0079$ is
 not a contradiction. Clark–West asks whether the population MSPE is lower. A model can
 satisfy that while its own parameter-estimation noise leaves the realized forecast worse
-than a constant. It is evidence of a weak signal, not of a usable forecast, and it is
-exactly the case the Clark–West paper warns about.
+than a constant. But the two numbers are also computed against different benchmarks — the
+$p$-value against zero, the $R^2_{OS}$ against the recursive mean — and the zero-benchmark test
+rejects about 14% of the time when nothing is predictable, so the gap is not usable as
+evidence of a weak signal (paper, Section 6.1).
 
 ### 4.2 Predictive accuracy against the random walk
 

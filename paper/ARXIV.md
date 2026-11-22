@@ -61,14 +61,14 @@ methods in finance.
 
 **ACM class** `G.3; I.2.6` — probability and statistics; learning.
 
-**Abstract** (1,915 characters, under arXiv's 1,920 limit; plain text, no LaTeX macros)
+**Abstract** (1,918 characters, under arXiv's 1,920 limit; plain text, no LaTeX macros)
 
 > Tests of out-of-sample return predictability dispose of the asset's drift by estimating it, and
 > that is where they break. A model with an unpenalised intercept does not reduce to the zero
 > forecast when its slopes vanish, so racing it against zero tests no drift and no conditional
 > predictability jointly. We show in closed form that the resulting Clark--West statistic
 > converges to the t-statistic of the asset's mean return: at Bitcoin's drift a model with no
-> features at all is called significantly predictive in 43% of samples. We therefore eliminate
+> features at all is called significantly predictive in 27-42% of samples. We therefore eliminate
 > the drift instead of estimating it. A certificate is a non-negative wealth process -- one
 > bettor stakes on the signal, a second hedges every candidate drift -- whose infimum over the
 > nuisance is bounded by a martingale under the null. Validity is finite-sample and uniform in
