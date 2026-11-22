@@ -57,3 +57,6 @@ package-dir = { alphacert = "../src/alphacert" }
 [tool.setuptools.packages.find]
 where = ["../src"]
 include = ["alphacert*"]
+
+[tool.setuptools.package-data]
+alphacert = ["py.typed"]

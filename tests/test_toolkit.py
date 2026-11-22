@@ -16,7 +16,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "audit" / "scripts"))
 
-from goyal_welch_toolkit import (  # noqa: E402
+from goyal_welch_toolkit import (
     clark_west,
     diebold_mariano,
     encompassing_t,

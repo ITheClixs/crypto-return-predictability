@@ -27,6 +27,23 @@ def test_backtest_then_report(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -
 
 
 @pytest.mark.unit
+def test_report_keeps_its_own_figure_numbering(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Other studies write figures into the same directory; report must not renumber around them."""
+    monkeypatch.setattr(cli, "REPORTS_DIR", tmp_path)
+    monkeypatch.setattr(cli, "run_study", lambda cfg: make_study())
+    cli.main(["backtest", "--assets", "BTC", "--horizons", "1"])
+    (tmp_path / "figures" / "fig10_certificate.png").write_bytes(b"not part of this report")
+
+    cli.main(["report", "--assets", "BTC"])
+    md = (tmp_path / "results.md").read_text()
+    assert "fig10_certificate" not in md
+    assert "**Figure 1.** Purged, embargoed walk-forward design." in md
+    assert "![Figure 4](figures/fig4_dm_vs_cw.png)" in md
+
+
+@pytest.mark.unit
 def test_data_command(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture) -> None:
     import pandas as pd
 

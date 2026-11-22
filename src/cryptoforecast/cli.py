@@ -17,7 +17,7 @@ from .config import DEFAULT_CONFIG, StudyConfig
 from .data.loaders import load_ohlcv
 from .evaluate.latex import all_tables
 from .evaluate.report import results_table, write_markdown
-from .plots import generate_figures
+from .plots import FIGURES, generate_figures
 from .study import run_study
 
 REPORTS_DIR = Path("reports")
@@ -57,9 +57,11 @@ def _cmd_backtest(args: argparse.Namespace) -> None:
 def _cmd_report(args: argparse.Namespace) -> None:
     cfg = _config_from_args(args)
     table = pd.read_csv(REPORTS_DIR / "results.csv")
-    figures = sorted(
-        str(p.relative_to(REPORTS_DIR)) for p in (REPORTS_DIR / "figures").glob("*.png")
-    )
+    # The report's own figures, in their declared order. Globbing the directory would also
+    # pick up figures other studies write there and renumber the report around them.
+    figures = [
+        f"figures/{name}" for name, _ in FIGURES if (REPORTS_DIR / "figures" / name).exists()
+    ]
     write_markdown(cfg, table, figures, REPORTS_DIR / "results.md")
     print(f"Re-rendered {REPORTS_DIR}/results.md from results.csv.")
 

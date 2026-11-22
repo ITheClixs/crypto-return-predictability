@@ -127,7 +127,10 @@ def test_interpretation_explains_a_survivor_with_negative_out_of_sample_r2(
     write_markdown(study.config, table, [], tmp_path / "results.md")
     md = (tmp_path / "results.md").read_text()
     assert "one of these has a *negative* out-of-sample" in md
-    assert "not of a usable forecast" in md
+    # The paper retracts the "evidence of a weak signal" reading: the p-value and the R^2 use
+    # different benchmarks, and the zero-benchmark test is oversized under drift.
+    assert "not evidence of a weak signal" in md
+    assert "It is evidence of a weak signal" not in md
 
 
 @pytest.mark.unit

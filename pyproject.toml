@@ -52,6 +52,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 cryptoforecast = ["py.typed"]
+alphacert = ["py.typed"]
 
 [tool.black]
 line-length = 100

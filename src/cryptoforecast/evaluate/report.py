@@ -255,8 +255,10 @@ def _interpretation(table: pd.DataFrame) -> str:
                 "R² against the drift benchmark. That is not a contradiction: "
                 "Clark-West tests whether the population mean squared error is lower, "
                 "which a model can achieve while its own estimation noise leaves the "
-                "realized forecast worse than a constant. It is evidence of a weak "
-                "signal, not of a usable forecast."
+                "realized forecast worse than a constant. But the p-value is computed "
+                "against the zero forecast and the R² against the recursive mean, and the "
+                "zero-benchmark test is oversized whenever the asset drifts, so the gap is "
+                "not evidence of a weak signal either."
             )
 
     overlap = set(map(tuple, survivors[["asset", "horizon", "model"]].to_numpy())) & set(
